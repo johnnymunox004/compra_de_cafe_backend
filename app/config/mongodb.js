@@ -3,8 +3,6 @@ import { MongoClient, ServerApiVersion } from 'mongodb';  // Usa import en lugar
 
 const uri = "mongodb+srv://mr1773393:Pancho12@clusterempresacafe.vwx5p.mongodb.net/nombredetubasededatos?retryWrites=true&w=majority&tls=true&appName=Clusterempresacafe";
 
-
-
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {

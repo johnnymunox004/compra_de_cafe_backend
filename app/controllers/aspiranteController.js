@@ -74,7 +74,7 @@ async function createEmpleados(req, res) {
     };
 
     await collection.insertOne(newEmpleado);
-    res.status(201).json({ message: "Empleado creado exitosamente" });
+    res.status(201).json({ message: "recibo creado exitosamente" });
   } catch (error) {
     console.error(`Error registrando empleado: ${error}`);
     res.status(500).json({ message: "Error interno del servidor" });

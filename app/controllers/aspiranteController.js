@@ -10,17 +10,25 @@ async function createAspirante(req, res) {
     precio,
     telefono,
     estado,
+    estado_monetario, // Nuevo campo
   } = req.body;
 
-  if (!nombre || !identificacion || !tipo_cafe || !peso || !precio || !telefono || !estado) {
+  if (
+    !nombre ||
+    !identificacion ||
+    !tipo_cafe ||
+    !peso ||
+    !precio ||
+    !telefono ||
+    !estado ||
+    !estado_monetario // Validación del nuevo campo
+  ) {
     return res.status(400).json({ message: "Todos los campos son obligatorios" });
   }
 
-  // Convertir a números
   const pesoNum = Number(peso);
   const precioNum = Number(precio);
 
-  // Calcular precio_total
   const precio_total = pesoNum * precioNum;
 
   try {
@@ -32,7 +40,8 @@ async function createAspirante(req, res) {
       precio: precioNum,
       telefono,
       estado,
-      precio_total, // Agregar precio_total
+      estado_monetario, // Agregar estado_monetario
+      precio_total,
       date_create: new Date(),
     };
 
@@ -44,7 +53,6 @@ async function createAspirante(req, res) {
   }
 }
 
-
 async function createEmpleados(req, res) {
   const {
     nombre,
@@ -52,12 +60,21 @@ async function createEmpleados(req, res) {
     tipo_cafe,
     peso,
     precio,
-    
     telefono,
     estado,
+    estado_monetario, // Nuevo campo
   } = req.body;
 
-  if (!nombre || !identificacion || !tipo_cafe || !peso || !precio ||  !telefono || !estado) {
+  if (
+    !nombre ||
+    !identificacion ||
+    !tipo_cafe ||
+    !peso ||
+    !precio ||
+    !telefono ||
+    !estado ||
+    !estado_monetario // Validación del nuevo campo
+  ) {
     return res.status(400).json({ message: "Todos los campos son obligatorios" });
   }
 
@@ -68,20 +85,20 @@ async function createEmpleados(req, res) {
       tipo_cafe,
       peso,
       precio,
-      estado,
       telefono,
+      estado,
+      estado_monetario, // Agregar estado_monetario
       date_create: new Date(),
     };
 
     await collection.insertOne(newEmpleado);
-    res.status(201).json({ message: "recibo creado exitosamente" });
+    res.status(201).json({ message: "Empleado creado exitosamente" });
   } catch (error) {
     console.error(`Error registrando empleado: ${error}`);
     res.status(500).json({ message: "Error interno del servidor" });
   }
 }
 
-// Leer todos
 const getAllAspirantes = async (req, res) => {
   try {
     const aspirantes = await collection.find().toArray();
@@ -92,7 +109,6 @@ const getAllAspirantes = async (req, res) => {
   }
 };
 
-// Leer uno
 async function getAspirante(req, res) {
   try {
     const id = req.params.id;
@@ -112,48 +128,49 @@ async function getAspirante(req, res) {
   }
 }
 
-// Actualizar
 async function updateAspirante(req, res) {
   try {
     const id = req.params.id;
 
-    // Verificación de ID válido
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: "ID inválido" });
     }
 
-    // Obtener los datos del cuerpo de la solicitud
-    const { nombre, identificacion, tipo_cafe, peso, precio, telefono, estado } = req.body;
+    const {
+      nombre,
+      identificacion,
+      tipo_cafe,
+      peso,
+      precio,
+      telefono,
+      estado,
+      estado_monetario, // Nuevo campo
+    } = req.body;
 
-    // Asegúrate de que 'peso' y 'precio' sean números
     const pesoNum = Number(peso);
     const precioNum = Number(precio);
 
-    // Validación: asegurar que peso y precio sean valores numéricos válidos
     if (isNaN(pesoNum) || isNaN(precioNum)) {
       return res.status(400).json({ message: "Peso y precio deben ser números válidos" });
     }
 
-    // Calcular el nuevo precio_total
     const precio_total = pesoNum * precioNum;
 
-    // Actualizar los campos del aspirante
     const updates = {
       nombre,
       identificacion,
       tipo_cafe,
       peso: pesoNum,
       precio: precioNum,
-      precio_total,  // Actualizar con el nuevo precio_total
+      precio_total,
       telefono,
       estado,
+      estado_monetario, // Actualizar estado_monetario
       date_create: req.body.date_create ? new Date(req.body.date_create) : undefined,
     };
 
-    // Eliminar cualquier campo undefined
     Object.keys(updates).forEach((key) => updates[key] === undefined && delete updates[key]);
 
-    // Realizar la actualización en la base de datos
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
       { $set: updates }
@@ -163,7 +180,6 @@ async function updateAspirante(req, res) {
       return res.status(404).json({ message: "Aspirante no encontrado" });
     }
 
-    // Enviar los datos actualizados de vuelta al cliente
     const updatedAspirante = await collection.findOne({ _id: new ObjectId(id) });
     res.status(200).json({ message: "Aspirante actualizado exitosamente", aspirante: updatedAspirante });
   } catch (error) {
@@ -172,8 +188,6 @@ async function updateAspirante(req, res) {
   }
 }
 
-
-// Eliminar
 async function deleteAspirante(req, res) {
   try {
     const id = req.params.id;
@@ -193,8 +207,6 @@ async function deleteAspirante(req, res) {
   }
 }
 
-
-// Función auxiliar para obtener aspirante por ID
 async function getAspiranteById(aspiranteId) {
   if (!ObjectId.isValid(aspiranteId)) {
     throw new Error("ID inválido");
@@ -203,7 +215,6 @@ async function getAspiranteById(aspiranteId) {
   return aspirante;
 }
 
-// Función auxiliar para actualizar aspirante
 async function updateAspiranteOne(aspiranteId, updatedAspiranteData) {
   if (!ObjectId.isValid(aspiranteId)) {
     throw new Error("ID inválido");
